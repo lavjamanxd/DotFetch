@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -30,22 +31,36 @@ namespace dotfetch
                 Console.Write(".");
             }
 
-            using (var bmpScreenCapture = new Bitmap(Screen.PrimaryScreen.Bounds.Width,
-                                            Screen.PrimaryScreen.Bounds.Height))
-            {
-                using (var g = Graphics.FromImage(bmpScreenCapture))
-                {
-                    g.CopyFromScreen(Screen.PrimaryScreen.Bounds.X,
-                                     Screen.PrimaryScreen.Bounds.Y,
-                                     0, 0,
-                                     bmpScreenCapture.Size,
-                                     CopyPixelOperation.SourceCopy);
-                    var filename = "Screenshot" + DateTime.Now.ToString().Replace('.', '_').Replace(":", string.Empty) + ".png";
-                    bmpScreenCapture.Save(filename, ImageFormat.Png);
-                }
-            }
+            var filename = "Screenshot" +
+                           DateTime.Now.ToString().Replace('.', '_').Replace(":", string.Empty) + ".png";
 
-            Console.Write(" done :3");
+            try
+            {
+                using (var bmpScreenCapture = new Bitmap(Screen.PrimaryScreen.Bounds.Width,
+                    Screen.PrimaryScreen.Bounds.Height))
+                {
+                    using (var g = Graphics.FromImage(bmpScreenCapture))
+                    {
+                        g.CopyFromScreen(Screen.PrimaryScreen.Bounds.X,
+                            Screen.PrimaryScreen.Bounds.Y,
+                            0, 0,
+                            bmpScreenCapture.Size,
+                            CopyPixelOperation.SourceCopy);
+                        using (
+                            var filestream = new FileStream(Application.StartupPath + "/" + filename, FileMode.CreateNew)
+                            )
+                        {
+                            bmpScreenCapture.Save(filestream, ImageFormat.Png);
+                        }
+                    }
+                }
+
+                Console.Write(" done :3");
+            }
+            catch
+            {
+                Console.Write("failed to create file at : " + Application.StartupPath + "/" + filename);
+            }
         }
 
         private void WriteSysInfo(int globalOffset)

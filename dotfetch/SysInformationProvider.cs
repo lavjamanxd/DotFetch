@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
+using System.Windows.Forms.VisualStyles;
 using Microsoft.VisualBasic.Devices;
 
 namespace dotfetch
@@ -103,15 +104,16 @@ namespace dotfetch
 
         private void SetUpBatteryInfo()
         {
-            var batteryInfo = GetManagementClassProperties("Win32_Battery").FirstOrDefault().ToList();
-
+            var batteryInfo = GetManagementClassProperties("Win32_Battery");
+            var firstBattery = batteryInfo?.FirstOrDefault();
+            if (firstBattery == null) return;
             BatteryAvailable = true;
             IsBatteryCharging =
-                batteryInfo.FirstOrDefault(x => x.Name.Equals("BatteryStatus")).Value.ToString().Equals(1)
+                firstBattery.FirstOrDefault(x => x.Name.Equals("BatteryStatus")).Value.ToString().Equals(1)
                     ? false
                     : true;
             BatteryChargeState =
-                batteryInfo.FirstOrDefault(x => x.Name.Equals("EstimatedChargeRemaining")).Value.ToString();
+                firstBattery.FirstOrDefault(x => x.Name.Equals("EstimatedChargeRemaining")).Value.ToString();
         }
 
         private void SetUpSystemInfo()

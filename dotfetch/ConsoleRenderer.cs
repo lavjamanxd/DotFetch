@@ -32,7 +32,7 @@ namespace dotfetch
             }
 
             var filename = "Screenshot" +
-                           DateTime.Now.ToString().Replace('.', '_').Replace(":", string.Empty) + ".png";
+                           DateTime.Now.ToString("yyMMddhhmmss") + ".png";
 
             try
             {
